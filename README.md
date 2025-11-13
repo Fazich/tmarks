@@ -12,8 +12,31 @@
 
 简体中文
 
-[在线演示](https://tmarks.669696.xyz) | [问题反馈](https://github.com/yourusername/tmarks/issues
+[在线演示](https://tmarks.669696.xyz) | [问题反馈](https://github.com/yourusername/tmarks/issues)
 
+---
+
+## 🚀 一键部署
+
+[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/yourusername/tmarks)
+
+> 点击按钮后,Cloudflare会自动:
+> 1. Fork仓库到你的GitHub账号
+> 2. 创建Cloudflare Pages项目
+> 3. 配置构建设置
+> 4. 开始首次部署
+>
+> ⚠️ **部署后还需要手动配置:**
+> - 创建D1数据库并运行迁移
+> - 创建KV命名空间
+> - 配置环境变量(JWT_SECRET、ENCRYPTION_KEY)
+> - 绑定D1和KV资源
+>
+> 详细步骤请查看 [部署指南](#-部署)
+
+</div>
+
+---
 
 ## ✨ 项目简介
 
@@ -34,6 +57,7 @@ TMarks 是一个现代化的智能书签管理系统，结合 AI 技术自动生
 - **数据库**: Cloudflare D1 (SQLite)
 - **缓存**: Cloudflare KV
 - **AI集成**: 支持 OpenAI、Anthropic、DeepSeek、智谱等8+提供商
+
 ---
 
 ## 🚀 快速开始
@@ -82,6 +106,7 @@ pnpm dev
 **前置要求:**
 - Cloudflare账号
 - GitHub账号
+- 安装Wrangler CLI: `npm install -g wrangler`
 
 **步骤:**
 
@@ -97,28 +122,39 @@ pnpm dev
 
 3. **创建资源**
    ```bash
-   d1 create tmarks-prod-db
-   kv:namespace create "RATE_LIMIT_KV"
-   kv:namespace create "PUBLIC_SHARE_KV"
+   wrangler login
+   cd tmarks
+   wrangler d1 create tmarks-prod-db
+   wrangler kv:namespace create "RATE_LIMIT_KV"
+   wrangler kv:namespace create "PUBLIC_SHARE_KV"
    ```
 
 4. **配置wrangler.toml**
    将上一步的ID填入 `tmarks/wrangler.toml`
 
 5. **运行数据库迁移**
-   控制台执行下面的sql
-   ```
-   tmarks\migrations\d1_console_pure.sql  我们控制台可以直接执行这个数据初始化
+   ```bash
+   # 在 Cloudflare D1 控制台执行 SQL
+   # 文件路径: tmarks/migrations/d1_console_pure.sql
+   # 在控制台直接复制粘贴该文件内容并执行
    ```
 
-6. **敏感信息控制台面板配置环境变量**
+6. **配置环境变量**
    Settings → Environment variables → Production:
    - `JWT_SECRET`: `openssl rand -base64 48`
    - `ENCRYPTION_KEY`: `openssl rand -base64 48`
 
-7. **重新部署**
+7. **配置资源绑定**
+   Settings → Functions:
+   - D1: `DB` → `tmarks-prod-db`
+   - KV: `RATE_LIMIT_KV` → 选择创建的KV
+   - KV: `PUBLIC_SHARE_KV` → 选择创建的KV
+
+8. **重新部署**
    Deployments → Retry deployment
 
+
+---
 
 ## 📄 许可证
 
